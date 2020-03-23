@@ -1,0 +1,1088 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage{amsthm, amsmath, amssymb, enumerate, qtree, mathtools}
+
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{prop}[lem]{Proposition}
+\newtheorem{cor}[lem]{Corollary}
+\newtheorem{theo}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem{mydef}[lem]{Definition}
+\newtheorem{remark}[lem]{Remark}
+\newtheorem{remarks}[lem]{Remarks}
+\newtheorem{example}[lem]{Example}
+
+
+
+\begin{document}
+
+\title{\LARGE {\bf On Herbrand's Theorem}}
+
+\author{Jack Webb
+}
+\date {March 2014}
+
+\maketitle
+
+\pagenumbering{gobble}
+
+\begin{abstract}
+Herbrand's Theorem of 1930, which gives (in a certain way) a reduction of first-order provability to propositional validity, has been influential throughout the 20th century in both Proof Theory and Automated Theorem Proving. However due to its length and perceived difficulty Herbrand's proof is rarely studied, with authors preferring to give alternative proofs or no proof at all.
+
+In this dissertation I aim to show that Herbrand's proof is not as impenetrable as it seems. I rework Herbrand's reasoning and replace some definitions and proofs to give greater clarity to the structure of his argument.  In this way I prove Herbrand's Theorem in a manner both accessible and similar to the manner in which it was originally proved.
+
+\end{abstract}
+
+\newpage\mbox{}\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\newpage\mbox{}\newpage
+
+\chapter{Introduction}
+
+In his doctoral dissertation of 1930, Jacques Herbrand published the theorem he called his ``Fundamental Theorem". In its simplest form, the theorem provides a reduction of first-order provability to propositional validity. Given a sentence $\varphi$ of first-order logic, the theorem provides a sequence of propositional sentences $P_0 , P_1, \ldots$ such that $\varphi$ is provable if and only if $P_i$ is truth-functionally valid for some $i$. This result was not only important in mathematical logic in the early 20th century, but also came to have a central role in the field of Automated Theorem Proving from the 1950s. The motivating idea behind this dissertation is that it is not only Herbrand's result that is important but also Herbrand's original proof. Whilst the result is fairly well-known, the proof is rarely dealt with in modern mathematics. This is partly because of the perceived difficulty of following Herbrand's reasoning; in this dissertation, my aim is to show that, with some minor alterations, Herbrand's proof is not as impenetrable as is sometimes believed, and therefore it can be studied by anyone interested in the concepts that have emerged from it. 
+
+In this introduction I will say a bit more about Herbrand's motivations in his work, the reasons these motivations became an unforeseen advantage to pioneers in Automated Theorem Proving, and the treatment of Herbrand's work in the mathematical literature since its publication.
+
+\section{Hilbert's Programme and Herbrand's Motivations}
+
+In the late 1920s the field of mathematical logic was enormously influenced by the work of Hilbert, who had established a programme of research based on studies of formal logical systems. Hilbert influenced Herbrand greatly, not only by establishing proof theory, but also by providing the goal towards which Herbrand was working in his thesis: namely, of proving the consistency of certain formal systems. In particular, in his thesis and in a later paper \cite{jh consistency}, Herbrand used his fundamental theorem to show the consistency of a particular fragment of arithmetic.
+
+A crucial part of Herband's work, which was motivated by philosophical views more widely held amongst mathematicians in Herbrand's day than today, is that his proofs are constructive. Herbrand thought that existence proofs were not valid unless they explicitly demonstrated how you could construct the object in question. This results in two aspects of his mathematics that are important for us. Firstly, lots of proofs are details of processes one could use to find a certain mathematical object, written in such a way as to look almost like algorithms to a modern reader. Secondly, as proofs themselves become mathematical objects in proof theory, Herbrand didn't just talk about sentences being ``provable" but rather showed how you could construct an actual proof. These two features of Herbrand's proof would turn out to be a big advantage when his work was discovered by those working on Automated Theorem Proving.
+
+\section{Herbrand's Theorem in Automated Theorem Proving}
+\label{sec:atp}
+
+Suppose you want to use a computer to investigate whether $\varphi \vdash \psi$ for two first-order sentences $\varphi$ and $\psi$. One na\"{\i}ve approach might be to apply every combination of the rules of your proof system, with $\varphi$ as a premise, and see if $\psi$ ever appears. Needless to say, this is very inefficient.
+
+Herbrand's Theorem gives us a more viable approach. Note that $\varphi \vdash \psi$ is equivalent in a standard proof system to $\vdash \neg \varphi \lor \psi$. Recall our summary of Herbrand's result above: that given a sentence (in this case $\neg \varphi \lor \psi$), we can establish a sequence of propositional sentences $P_0 , P_1, \ldots$ such that $\neg \varphi \lor \psi$ is provable if and only if $P_i$ is truth-functionally valid for some $i$. It is very easy to algorithmically decide the validity of propositional sentences using the truth table method, for example. Herbrand's Theorem suggests an algorithm for deciding whether $\varphi \vdash \psi$:
+
+\begin{enumerate}
+\item Set $i = 0$.
+\item Compute $P_i$ for the sentence $\neg \varphi \lor \psi$.
+\item Decide whether $P_i$ is a tautology.
+\item If it is, return ``True".
+\item If it is not, increase $i$ by one and return to step 2.
+\end{enumerate}
+
+Note that if the inference is valid the algorithm will halt, but if it is not valid the algorithm will keep going indefinitely. This is not a weakness of the algorithm but reflects a more general result from computer science, that the validity of a sentence is necessarily a semi-decidable problem. For more information on this, see \cite{kr&r}.
+
+Importantly, the constructive nature of Herbrand's proof means that Herbrand's Theorem provides a method for computers to produce formal proofs, and not just a method to decide when a proof exists. We will return to this in Remark \ref{con remark}.
+
+There are other areas in which concepts from Herbrand's proof have influenced computer science. Some of the processes outlines in his proofs have since been converted into useful algorithms. One example is the Unification Algorithm: see page \pageref{unif} of this dissertation for more details.
+
+\section{Modern Treatment of Herbrand's Theorem}
+
+Let us look now at the treatment of Herbrand's work in the mathematical literature since its publication. It is worth noting that there are several different, but closely related, statements that are sometimes called Herbrand's Theorem. The version we are considering in this dissertation is that which Herbrand originally stated and proved.
+
+I have shown above that it is not only Herbrand's result that is important, but also his proof. However it is very hard to find a modern exposition of Herbrand's Theorem whose proof follows similar reasoning to that of Herbrand. I believe this is for four main reasons:
+
+\begin{enumerate}[(a)]
+
+\item Herbrand suffered a tragic young death\footnote{The story of Herbrand's life is an interesting one, which we sadly do not have space to go into in this dissertation. He was widely regarded to be one of the most promising young mathematicians of his generation, but unfortunately died in a climbing accident in 1931 at the age of 23. For more details see the biography provided in \cite{chevalley2}.} and thus did not go on to have the brilliant career his early work promised. Therefore his work has not been studied to the extent of that of G\"o{del} and Gentzen.
+
+
+\item There is historical evidence that Herbrand wrote his thesis in a rush, due to his desire to complete it before a year of compulsory military service, and this is evident in the work's reputation as rather impenetrable. In the decade after its publication, little was written about Herbrand's work except for the comment from Hilbert and Bernays \cite{hilbertbernays} that ``Herbrand's proof is hard to follow". More recently, Goldfarb (in the intoduction of \cite{herb english}) has written that ``Due in part to the difficulty of Herbrand's texts and in part to surface similarities with work of Skolem and Gentzen, Herbrand's mode of investigation is not widely understood today."
+
+
+\item There is a lot of crossover between Herbrand's work and that of Gentzen, L\"o{wenheim}, Skolem, and G\"o{del}. The proofs and theorems of these four mathematicians have gone on to be more widely known, meaning that Herbrand's work is sometimes little other than a second method of proving a result. This perceived lack of significance has meant that some prominent proof theory text books, such as those by Takeuti and Sch\"u{tte} (\cite{takeuti} and \cite{schutte}, respectively), do not mention Herbrand. There are other sources that state Herbrand's Theorem but omit the proof: for example, \cite{enderton} and a lot of the computer science literature (e.g. \cite{kr&r} and \cite{ai}).
+
+
+\item If you are not constrained by a need for constructive proofs, and if you have some modern results, there are simpler alternative proofs you can give for Herbrand's Theorem. For example, Buss, in \emph{The Handbook of Proof Theory} \cite{buss}, gives a proof in the sequent calculus using Gentzen's cut elimination theorem. There is also a model theoretic proof that can be given using completeness and compactness (see section 5.3 of \cite{buss OHT}).
+\end{enumerate}
+
+Reading Herbrand's dissertation, I can't help but feel that this avoidance of his proof is unfortunate, as its core reasoning contains leaps of understanding that alternative proofs of Herbrand's Theorem omit. If one wishes to study these aspects of the proof (for example, its constructive nature) there is no source other than Herbrand's original thesis. For this reason, I believe it is a useful exercise to present once more Herbrand's proof, with some tidying-up in order to increase its clarity.
+
+The main source I have used in my work is Dreben, Goldfarb and van Heijenoort's English translation of Herbrand's dissertation, in \cite{herb english}, and especially the fifth chapter of this, in \cite{f to g}, along with the commentary notes provided in \cite{f to g} by Dreben and van Heijenoort. In addition to these, I have also found Herbrand's later paper, \cite{jh consistency}, Goldfarb's papers \cite{goldfarb90} and \cite{goldfarb93} and Buss's paper \cite{buss OHT} to be useful in understanding particular parts of Herbrand's work.
+
+I have broadly followed the reasoning in Herbrand's original dissertation, though I have altered some definitions, some proofs and the ordering of some points. I believe that these changes all help the proof to be clearer. In particular, I have changed the names of Property A, B and C: these have become the properties of ``having a tautological expansion", ``having a tautological expansion with respect to dominance" and ``being a normalizable sentence" respectively. The reasoning in the final proof of Herbrand's Theorem in \ref{sec:proof} is very similar to Herbrand's, although more details are altered in the sections leading up to this (for example, my process of generation of a sentence is presented differently to Herbrand's corresponding process of derivation of a sentence).
+
+I have also added some commentary to the proof, along three broad lines: explanatory comments about the reasoning, historical comments about the development of Herbrand's ideas throughout the 20th century, and comments regarding the applications of Herbrand's work.
+
+\chapter{Proof of Herbrand's Theorem}
+
+In what follows I will state and prove Herbrand's Theorem. Before we can state the theorem there are some preliminaries that we must establish. We will state Herbrand's theorem for the first time in \ref{sec: sketch}. The proof of the theorem is fairly long and technical, and so there are several intermediary theorems and lemmas we must prove before we come to the final proof of the theorem in \ref{sec:proof}.
+
+\section{Preliminaries}
+\label{sec:prelim}
+
+In the following discussion the language we will use, along with many of the definitions of basic logical concepts, will be mainly based on the lecture notes for the B1a logic course (available at \cite{logic10}). I will not define every logical concept I use where the concepts are well-established: the precise definition of notions which I have not defined will be as in \cite{logic10}.
+
+\begin{mydef}
+\label{def2.1.1}
+The language $\mathcal{L}$ consists of (only) the following logical and non-logical symbols. 
+
+\noindent Logical symbols:
+\begin{enumerate}[(i)]
+\item Variables $x$ and $x_{i}$ for $i \in \mathbb{N}$
+\item Logical connectives $\neg$ and $\lor$
+\item Quantifiers $\forall$ and $\exists$
+\item Brackets $($ and $)$
+\end{enumerate}
+
+\noindent Non-logical symbols (for $n \in \mathbb{N}$ and $k \in \mathbb{N}$):
+\begin{enumerate}[(i)]
+\item The $k$-ary predicate symbols $P^{(k)}_n$
+\item The $k$-ary function symbols $f^{(k)}_n$
+\item The constant symbols $c_n$ 
+\end{enumerate}
+\end{mydef}
+
+\begin{remarks}
+\begin{enumerate}[(i)]
+\item Although we are restricting the language $\mathcal{L}$ to only using $\neg$ and $\lor$, I will sometimes use other logical connectives (such as $\land$), defined from $\neg$ and $\lor$, when giving examples to elucidate the discussion. Similarly I will sometimes use other predicate letters (e.g. “$Q$”) and variable letters (e.g. “$y$”) when they help to make an example clearer.
+
+\item In the following discussion, we will sometimes write sentences such as $\varphi(x)$. This means that $x$ appears in $\varphi$ as a free variable, but it does not mean that there are no other free variables. This saves us from having to write ``$\varphi(x, x_1, x_2, \ldots , x_n)$ for some $n \ge 0$" every time we want to speak of $x$ appearing freely in a formula $\varphi$.
+\end{enumerate}
+\end{remarks}
+
+Formulas of $\mathcal{L}$ are defined as in \cite{logic10}, with the added stipulation that, for simplicity and clarity, in a formula of $\mathcal{L}$ no two quantifiers contain the same variable.
+
+We now define the proof system which we will use. This is fairly different to the system used in \cite{logic10}, and more closely follows the system that Herbrand uses. We shall call our system $Q_H$. First we shall define the quantifier-free tautologies.
+
+\begin{mydef}
+The \emph{quantifier-free tautologies} are those formulas, $\varphi$, of $\mathcal{L}$ that contain no quantifiers and are $\mathcal{L}$-equivalent to a tautology of propositional logic. By $\mathcal{L}$-equivalent to a tautology of propositional logic we mean: Replace all atomic formulas of $\varphi$ with a propositional variable $p_1, p_2, \ldots $ according to the following rule (where $\tau)i$ and $\upsilon_i$ are terms of $\mathcal{L}$ for all $i$):
+\begin{quote}
+{Replace $P_m^k(\tau_1, \ldots, \tau_m)$ and $P_n^l(\upsilon_1, \ldots, \upsilon_n)$ by the same propositional variable if and only if $m = n$, $k = l$ and $\tau_i = \upsilon_i$ for each $i \le m$.}
+\end{quote}
+\end{mydef}
+
+\noindent This is simply a precise way of saying that the quantifier free-tautologies are just propositional tautologies written in $\mathcal{L}$ with atomic formulas in the place of propositional variables. 
+
+\begin{remark}
+\label{truth-tables}
+We can check (in a finite time) whether a quantifier-free $\mathcal{L}$-formula is a tautology by replacing the atomic formulas according to the above rule and then using the truth-table method to check whether the resulting propositional formula is a tautology.
+\end{remark}
+
+\begin{mydef}
+The system $Q_H$ is composed of axioms and rules of inference. The axioms are the quantifier-free tautologies. The rules of inference are:
+\begin{enumerate}[(i)]
+\item MP: From $\varphi$ and $\neg \varphi \lor \psi$, infer $\psi$.
+\item Simplification: From $\varphi \lor \varphi$ infer $\varphi$ (More precisely, because we do not allow two quantifiers to contain the same variable in a formula, from $\varphi \lor \varphi'$ infer $\varphi$, where $\varphi'$ is an alphabetical variant of $\varphi$).
+\item Universal generalization: from $\varphi(x)$, infer $\forall(x) \varphi(x)$.
+\item Existential generalization: from $\varphi(\tau)$, where $\tau$ is an $\mathcal{L}$-term, infer $\exists(x)\varphi(x)$.
+\item The rules of passage:
+\label{rulesofpassage}
+\noindent We can replace any occurrence of any formula in one of the following forms by the other in the pair. Odd numbered rules are given by replacing the first formula in a pair with the second; even numbered rules are given by replacing the second formula in a pair by the first:
+\begin{align}
+&(1) \, , (2) \; \; &\neg \forall x A(x) ; \; \exists x \neg A(x) \notag \\
+&(3) \, , (4) \; \; &\neg \exists x A(x) ; \; \forall x \neg A(x) \notag \\
+&(5) \, , (6) \; \; &\forall x A(x) \lor Z ; \; \forall x (A(x) \lor Z) \notag \\
+&(7) \, , (8) \; \; &Z \lor \forall x A(x) ; \; \forall x (Z \lor A(x)) \notag \\
+&(9) \, , (10) \; \; &\exists x A(x) \lor Z ; \; \exists x (A(x) \lor Z) \notag \\
+&(11) \, , (12) \; \; &Z \lor \exists x A(x) ; \; \exists x (Z \lor A(x)) \notag
+\end{align}
+\noindent where A and Z are $\mathcal{L}$-formulas and Z doesn't contain $x$.
+\end{enumerate}
+If an $\mathcal{L}$-formula, $\varphi$, is provable from the axioms using these rules of inference, we say it is $Q_H$-provable.
+\end{mydef}
+
+$Q_H$-provability is equivalent to provability in any other standard proof system, including that of \cite{logic10}. We do not prove this here, but the reader can consult Herbrand's thesis (\cite{jhdiss} pp. 89-91) for the proof of the equivalence of this proof system with other standard proof systems.
+
+Of special importance are the rules of passage, which we will be using in a lot of proofs. Note that, due to their construction, we have that if $\psi$ is derived from $\varphi$ by the rules of passage, $\psi$ and $\varphi$ are logically equivalent.
+
+For the rest of our discussion of preliminaries, we define several terms which we will use often in the following discussion.
+
+\begin{mydef}
+\label{genres def}
+\begin{enumerate}[(i)]
+\item We say that a well-formed sub-formula $\psi$ of a formula $\varphi$ \emph{occurs negatively in} $\varphi$ if it is in the scope of an odd number of $\neg$ signs, and that $\psi$ \emph{occurs positively in} $\varphi$ if it is in the scope of an even number of $\neg$ signs (where we include $0$ as even).
+\item If $\forall x \psi (x)$ occurs positively in $\varphi$ or $\exists x \psi (x)$  occurs negatively in $\varphi$, we say that the variable $x$ and its quantifier are \emph{general} in $\varphi$.
+\item If $\forall x \psi (x)$ occurs negatively in $\varphi$ or $\exists x \psi (x)$ occurs positively in $\varphi$, we say that the variable $x$ and its quantifier are \emph{restricted} in $\varphi$.
+\end{enumerate} 
+\end{mydef}
+
+\begin{mydef}
+\label{prenex def}
+A \emph{prenex formula} is an $\mathcal{L}$-formula whose quantifiers all occur as a string at the beginning of the formula.
+\end{mydef}
+
+\begin{prop}
+\label{many pren}
+Every formula, $\varphi$, is logically equivalent to a formula which is in prenex form (and in fact it may be logically equivalent to more than one such formula). 
+\end{prop}
+\begin{proof}
+This is a simple proof by induction on the complexity of a formula (for example see \cite{jhdiss} p. 77).
+\end{proof}
+
+\begin{mydef}
+We denote by Pre($\varphi$) the unique prenex formula equivalent to $\varphi$ whose quantifiers occur in the same order as in $\varphi$.
+\end{mydef}
+
+\begin{prop}
+Given a formula $\varphi$, we can obtain Pre($\varphi$) by using the rules of passage.
+\end{prop}
+\begin{proof}
+Again, this proof can be easily obtained by induction on the complexity of a formula (for example see \cite{jhdiss} p. 77).
+\end{proof}
+
+\begin{remark}
+\label{status quant}
+A bound variable in $\varphi$ is general if and only if it appears in a quantifier $\forall x$ in Pre($\varphi$), and restricted if and only if it appears in a quantifier $\exists x$ in Pre($\varphi$).
+\end{remark}
+
+Next we look at a form of a formula in which the scope of each bound variable has been reduced as much as possible using the rules of passage. We say ``the scope of a bound variable" to mean, more precisely, the scope of the quantifier governing that variable.
+
+\begin{prop}
+\label{scope red}
+The following two rules are consequences of the rules of passage:
+\begin{enumerate}[(i)]
+\item If the scope of $x$ is $\neg \varphi (x)$, we can decrease the scope of $x$ so that it becomes $\varphi(x)$.
+\item If the scope of $x$ is $\varphi(x) \lor \psi$, or $\psi \lor \varphi(x)$, where $\psi$ does not contain $x$, we can decrease the scope of $x$ so that it becomes $\varphi(x)$.
+\end{enumerate}
+\noindent Note that because these rules only involve the use of the rules of passage, the input and output of rules (i) and (ii) are both logically equivalent.
+\end{prop}
+
+\begin{mydef}
+\label{defcan}
+Given a formula $\varphi$, we take the rightmost quantifier and reduce its scope as much as possible using \ref{scope red} (i) and (ii). We call its scope once this process has been exhausted the variable's \emph{minimal scope}. Proceeding right to left, we obtain the minimal scopes of each bound variable in $\varphi$. Once we have done this for all bound variables in $\varphi$, we say that we have the \emph{canonical form} of $\varphi$. We denote this formula, which is unique, Can($\varphi$).
+\end{mydef}
+
+We see from \ref{scope red} that $\varphi$ and Can($\varphi$) will be logically equivalent.
+
+\begin{mydef}
+\label{dom def}
+In a formula $\varphi$, we say that a variable $x$ \emph{dominates} a variable $y$ if the minimal scope of $y$ is strictly contained within the minimal scope of $x$.
+\end{mydef}
+
+\begin{mydef}
+\label{sup def}
+In a formula $\varphi$, we say that a variable $x$ is \emph{superior} to a variable $y$ if the scope of $y$ is strictly contained within the scope of $x$.
+\end{mydef}
+
+\begin{remark}
+\label{dom sup}
+Therefore, to link \ref{dom def} and \ref{sup def}, we can see that $x$ dominates $y$ in a formula $\varphi$ if and only if $x$ is superior to $y$ in Can($\varphi$).
+\end{remark}
+
+\begin{remark}
+\label{canonpres}
+We note that the canonical form of a formula is preserved by the rules of passage. This is easy to see by observing that the canonical form is the same for the “input” and “output” formulas for each of the twelve rules of passage.
+\end{remark}
+
+Several new concepts have been introduced above, so let us conclude this section by looking at an example which illustrates the various definitions.
+
+\begin{example}
+\label{ex1}
+Consider the formula
+$$
+\varphi_1 = \exists x \forall y (P(x,y) \lor \neg \forall z P(x,z))
+$$
+The restricted variables in $\varphi_1$ are $x$ and $z$, whilst $y$ is a general variable. Further, we see that
+$$
+\mbox{Pre}(\varphi_1) = \exists x \forall y \exists z (P(x,y) \lor \neg P(x,z)).
+$$
+Pre($\varphi_1$) can be obtained from $\varphi_1$ by use of the rules of passage (1) followed by (6). In agreement with \ref{status quant}, $x$ and $z$ are quantified by existential quantifiers whilst $y$ is quantified by a universal quantifier.
+
+The canonical form of $\varphi_1$ is
+$$
+\mbox{Can}(\varphi_1) = \exists x ( \forall y P(x,y) \lor \neg \forall z P(x,z))
+$$
+From this we can see that $x$ dominates $y$ and $z$ in $\varphi_1$ (and indeed, $x$ is superior to $y$ and $z$ in Can($\varphi_1$)). We can also see that $y$ is superior to $z$ in $\varphi_1$, but $y$ does not dominate $z$.
+\end{example}
+
+
+\section{Herbrand expansions}
+\label{sec:expans}
+
+In this section we will define, step by step, a process which gives us the Herbrand Expansion of a formula $\varphi$. Once we have done this we can state Herbrand's Theorem. 
+
+For what follows, we will deal exclusively with $\mathcal{L}$-sentences; that is, $\mathcal{L}$-formulas that contain no free variables. However, we note that all of these definitions and theorems also apply to formulas with free variables if, for a formula $\varphi(x)$ with $x$ a free variable, we instead consider $\forall x \varphi(x)$. It can be shown\footnote{For example, in \cite{jhdiss} p.83} that provability of $\varphi(x)$ is equivalent to provability of $\forall x \varphi(x)$, and thus this gives us a way to include the more general case of $\mathcal{L}$-formulas whilst ostensibly talking only about $\mathcal{L}$-sentences.
+
+The first step in the process is Herbrandization: this is a proof-theoretic analogue to Skolemization.
+
+\begin{mydef}[Herbrandization]
+\label{Herbranization}
+Given a sentence, $\varphi$, we define \emph{Herbrandization} as the following two-step process:
+\begin{enumerate}[(1)]
+\item For each general variable, $x$, in $\varphi$, we delete the quantifier that governs $x$ and replace $x$ by a term $f_i(y_1, \ldots\ , y_m)$, where $f_i$ is a function symbol that does not appear elsewhere in $\varphi$ and $y_1, \ldots , y_m$ are the restricted variables which are superior to $x$.
+\item For each restricted variable, $x$, in $\varphi$, we delete the quantifier which governs $x$, so that $x$ becomes a free variable.
+\end{enumerate}
+\noindent Note that Step (1) should be carried out before Step (2), but within the steps the order in which we replace the variables doesn't matter. We denote the result of the application of the process of Herbrandization to $\varphi$ as Her($\varphi$). 
+\end{mydef}
+
+\begin{remark}
+We draw attention to the special case where $x$ is a general variable that is not dominated by any restricted variables. In this case, the function introduced will be 0-place; that is, it will be a constant. In this case we replace the general variable by a constant letter $c_i$, where $c_i$ does not appear elsewhere in $\varphi$.
+\end{remark}
+
+What we obtain when we apply the process of Herbrandization to a sentence $\varphi$ is a formula  $\mbox{Her}(\varphi)(x_1, \ldots , x_n)$ where $x_1, \ldots , x_n$  are restricted variables in $\varphi$ but are free in Her($\varphi$). Note also that Her($\varphi$) is quantifier-free.
+
+Consider once again the example from Section \ref{sec:prelim}:
+$$
+\varphi_1 = \exists x \forall y (P(x,y) \lor \neg \forall z P(x,z))
+$$
+We noted above that $x$ and $z$ are restricted variables, $y$ is a general variable and $x$ is superior to $y$. Therefore, applying the process of Herbrandization to $\varphi_1$, we get:
+$$
+\mbox{Her}(\varphi_1) = P(x, f_1(x)) \lor \neg P(x, z)
+$$
+
+We use the next three definitions to define the notion of a Herbrand domain.
+
+\begin{mydef}
+\label{height}
+Let $\tau$ be a term. We define the \emph{height} of $\tau$, written height($\tau$), recursively:
+\begin{enumerate}[(i)]
+\item $\mbox{height}(x_i) = 0$ for a variable $x_i$
+\item $\mbox{height}(c_i) = 0$ for a constant $c_i$
+\item $\mbox{height}(f(\tau_1, \ldots, \tau_n)) = \mbox{max} \{ \mbox{height} (\tau_1), \ldots, \mbox{height} (\tau_n) \} + 1$
+\end{enumerate}
+\end{mydef}
+
+\begin{mydef}
+\label{base}
+We define the \emph{Herbrand base} of $\varphi$ to be the set 
+$$
+c_0 \cup \{ c_i \mid c_i \mbox{ appears in } Her(\varphi)\} .
+$$
+\end{mydef}
+
+\begin{mydef}
+Define Terms($\varphi$) to be the set of terms of $\mathcal{L}$ which contain only function symbols that appear in Her($\varphi$) and constants that are in the Herbrand base of $\varphi$ (and do not contain variables).
+\end{mydef}
+
+We explicitly include $c_0$ in the Herbrand Base, even if it already appears in Her($\varphi$), because we will need to know later on that Terms($\varphi$) is a non-empty set.
+
+\begin{mydef}[Herband domain]
+\label{herbdom}
+Given a sentence $\varphi$, we define the \emph{Herbrand domains}, $D(\varphi, p)$, for all $p \ge 0$ as
+$$
+D(\varphi, p) = \{ \tau \in \mbox{Terms}(\varphi) \mid \mbox{height}(\tau) \le p \}
+$$
+\end{mydef}
+
+In particular, we note that $D(\varphi, 0)$ contains only constants, and so is the same as the Herbrand base of $\varphi$. Furthermore, $D(\varphi, p+1)$ can be constructed from $D(\varphi, p)$ as follows:
+\begin{align}
+D(\varphi, p+1) = \; & D(\varphi, p) \; \cup \notag \\
+& \{ f_j (\tau_1, \ldots, \tau_n) \mid f_j \mbox{ appears in } \mbox{Her}(\varphi) \mbox{ and } \tau_k \in D(\varphi, p) \} \notag
+\end{align}
+
+\begin{remark}
+\label{herb subsets}
+From this construction we can see that $D(\varphi, p) \subseteq D(\varphi, q)$ for all $q \ge p$.
+\end{remark}
+
+Considering once again our example of $\varphi_1$, we see that Her($\varphi_1$) has one function letter, $f_1$, and no constants. Therefore the Herbrand base will be the set $ \{c_o \}$, and from this we obtain, for $p = 1$ and $p = 2$,
+\begin{align}
+D(\varphi_1, 1) &= \{ c_0 , f_1(c_0) \} \notag \\
+D(\varphi_1, 2) &= \{ c_0, f_1(c_0) , f_1 (f_1 (c_0)) \} \notag
+\end{align}
+
+We just have one more definition to give before we can define a Herbrand expansion.
+
+\begin{mydef}
+An \emph{instance} of a formula $\varphi(x_1 , \ldots , x_n)$ over a set of terms, $S$, where $x_1 , \ldots , x_n$ are all of the free variables of $\varphi$, is a formula obtained by substituting terms in $S$ for $x_1 , \ldots , x_n$. That is, $\varphi [ \tau_1 / x_1, \tau_2 / x_2, \ldots , \tau_n / x_n ] $ is an instance of $\varphi(x_1 , \ldots , x_n)$ over $S$ for $\tau_1 , \ldots , \tau_n \in S$.
+\end{mydef}
+
+\begin{mydef}[Herbrand expansion]
+\label{herbexp}
+The \emph{Herbrand expansion} of order $p$ of a sentence $\varphi$, written $E(\varphi, p)$, is the disjunction of all instances of $\mbox{Her}(\varphi)(x_1, \ldots , x_n)$ over $D(\varphi, p)$.
+\end{mydef}
+
+To express this another way, we can say that
+
+$$
+E(\varphi, p) = \bigvee \limits_{\tau_i \in D(\varphi, p)} Her ( \varphi)[\tau_1 / x_1 , \ldots, \tau_n / x_n ]
+$$
+
+Returning to our example, let us look at the Herbrand expansion of $\varphi_1$ of order 1. The table on the right hand side shows the terms from $D(\varphi_1, 1)$ with which we have replaced the variables $x$ and $z$ in each line:
+\begin{align}
+& &\mathbf{x} \; \; \; \; \; \; &\mathbf{z} \notag \\
+E(\varphi_1, 1) = \; \; \; &P(c_0, f_1(c_0)) \lor \neg P(c_0, c_0) \; \; \; \; &c_0 \; \; \; \; \; \; &c_0 \notag\\
+\lor &P(c_0, f_1(c_0)) \lor \neg P(c_0, f_1(c_0)) &c_0 \; \; \; \; \; \; &f_1(c_0) \notag\\
+\lor &P(f_1(c_0), f_1(f_1(c_0))) \lor \neg P(f_1(c_0), c_0) &f_1(c_0) \; \; \; &c_0 \notag\\
+\lor &P(f_1(c_0), f_1(f_1(c_0))) \lor \neg P(f_1(c_0), f_1(c_0)) \; \; \; \; \; \; \; \; \; &f_1(c_0) \; \; \; &f_1(c_0) \notag
+\end{align}
+
+We are now in a position to state Herbrand's Theorem, using the notion of a Herbrand expansion.
+
+\section{Statement and proof sketch of Herbrand's Theorem}
+\label{sec: sketch}
+
+\begin{theo}[Herbrand's Theorem (version 1)]
+An $\mathcal{L}$-sentence, $\varphi$, is $Q_H$-provable if and only if $E(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$.
+\end{theo}
+\begin{proof}
+The proof of Herbrand's Theorem is rather technical. Instead of attempting to prove it all in one long passage, we will break down the proof into several parts. I will give a sketch here of the proof that will be given in more detail in the remainder of this dissertation.
+
+Firstly, in section \ref{sec:bc}, we prove some facts about $E(\varphi, p)$. We will also show that a sentence $\varphi$ has a tautological Herbrand expansion as we have defined above if and only if it has a tautological expansion under a slightly different notion of expansion, which Herbrand himself used in the statement of his theorem.
+
+In sections \ref{sec:attached} and \ref{sec:normal} we leave the notion of Herbrand expansions and instead focus on the notion of a ``Normal Identity". In \ref{sec:normal} we will show that if an $\mathcal{L}$-sentence is a normal identity then it is $Q_H$-provable, after having first proved in \ref{sec:attached} some facts about the prenex forms of a sentence which can be obtained using the rules of passage. Once we have established that normal identities are $Q_H$-provable, we can define a new type of sentence, called ``normalizable" sentences, which can be proved from normal identities. Thus normalizable sentences are $Q_H$-provable.
+
+Finally, in section \ref{sec:proof} we finish the proof of Herbrand's theorem. To show one direction, that if $\varphi$ is $Q_H$-provable then $E(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$, we use proof by induction on the complexity of the $Q_H$ proof of $\varphi$.
+
+To show the other direction, that if $E(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$ then $\varphi$ is $Q_H$-provable, we show that if $E(\varphi, p)$ is a quantifier-free tautology then $\varphi$ is a normalizable sentence. By the results in \ref{sec:normal}, this will entail that $\varphi$ is $Q_H$-provable.
+\end{proof}
+
+Before we move on, let us look at $E(\varphi_1, 1)$, as given in our example above. One of the disjuncts of $E(\varphi_1, 1)$ is
+$$
+P(c_0, f_1(c_0)) \lor \neg P(c_0, f_1(c_0)) .
+$$
+This is a quantifier-free tautology, and thus $E(\varphi_1, 1)$ is a quantifier-free tautology. Therefore, once we have proved Herbrand's Theorem, we will know that $\varphi_1$ is $Q_H$-provable.
+
+\section{Facts about tautological expansions}
+\label{sec:bc}
+
+In this section, we will only be speaking of tautologies in the context of quantifier-free tautologies. Therefore I will stop writing ``quantifier-free" and stipulate that ``tautology" means ``quantifier-free tautology" unless I explicitly say otherwise.
+
+If, for some sentence $\varphi$, we wish to say that $E(\varphi, p)$ is a tautology for some $p \ge 0$ but do not need to specify which $p$, then we will say that $\varphi$ \emph{has a tautological expansion}.
+
+The aim of the first part of this section will be to prove Theorem \ref{c theorem}, that if $\psi$ is derived from $\varphi$ using the rules of passage and $\varphi$ has a tautological expansion, then $\psi$ has a tautological expansion. Before this we first prove two basic facts about tautological expansions.
+
+At the end of this section we will introduce a slightly different version of a Herbrand expansion, which uses the dominance relation between variables rather than the superiority relation, and show that this alternative version gives equivalent results to the version we have used. The reason for this is that, whilst Herbrand used both notions, I find it aids the clarity of the proof to focus on just one version and then prove that the two are equivalent for our purposes.
+
+\begin{prop}
+\label{upwardsbc}
+If $E(\varphi, p)$ is a tautology and $q \ge p$ then $E(\varphi, q)$ is a tautology.
+\end{prop}
+\begin{proof}
+The case where $q = p$ is trivial. Suppose $q>p$. Remark \ref{herb subsets} tells us that $D(\varphi, p) \subseteq D(\varphi, q)$, and so every instance of Her($\varphi$) over $D(\varphi, p)$ is also an instance of Her($\varphi$) over $D(\varphi, q)$. Therefore we will be able to rearrange the order of the disjuncts in $E(\varphi, q)$ so that
+$$
+E(\varphi, q) \equiv E(\varphi, p) \lor \psi
+$$
+where $\psi$ is the disjunction of all instances of Her($\varphi$) over $D(\varphi, q)$ that contain at least one term from $D(\varphi, q) \setminus D(\varphi, p)$. Finally, due to the fact that if $A$ is a tautology then $( A \lor B )$ is a tautology, where $A$ and $B$ are quantifier-free sentences, we have that if $E(\varphi, p)$ is a tautology then $E(\varphi, q)$ is a tautology.
+\end{proof}
+
+\begin{lem}
+\label{her eq}
+For all sentences $\varphi$ and $\psi$, if Her($\varphi) = $Her($\psi$) then $E(\varphi, p) = E(\psi, p)$ for all $p \ge 0$.
+\end{lem}
+\begin{proof}
+Note that Definitions \ref{base} to \ref{herbexp} do not mention $\varphi$ except in the form Her($\varphi$). Thus, if $\mbox{Her}(\varphi) = \mbox{Her}(\psi)$, then for each $p$, $D(\varphi, p) = D(\psi, p)$ and further, $E(\varphi, p) = E(\psi, p)$.
+\end{proof}
+
+We now turn to Theorem \ref{c theorem}, which will show that the rules of passage preserve the property of having a tautological expansion. Herbrand, in his dissertation, believed the stronger claim that if $\psi$ is derived from $\varphi$ using the rules of passage and if $E(\varphi, p)$ is a tautology for some $p$, then $E(\psi, p)$ is a tautology for the same $p$. This was later shown to be false. A counterexample was given by Dreben, Andrews and Aanderaa \cite{Dreb1}, and Herbrand's proof was corrected in \cite{Dreb2} and \cite{Dreb3}\footnote{It is interesting to note that it has been recently discovered that G\"o{del} also discovered this error, but didn't publish anything on his findings. See \cite{goldfarb93} for a discussion of this.}. In the course of their proof, they provide a function, $\delta$, such that if $E(\varphi, p)$ is a tautology then $E(\psi, \delta(\varphi))$ will be a tautology, where $\delta(\varphi) \ge p$. However, this function is a complicated one with several arguments, including but not limited to $p$. We do not have the space to go into the full detail of these issues here, but an interested reader can consult the above three papers or \cite{goldfarb93} for more information. Regardless of this difficulty we can still say that, due to \ref{upwardsbc}, the rules of passage preserve the property of having a tautological expansion, though they do not preserve $p$ such that $E(\varphi, p)$ is a tautology.
+
+If the reader wishes to refresh their memory of the rules of passage, they are on page \pageref{rulesofpassage}.
+
+\begin{theo}
+\label{c theorem}
+If $\psi$ is derived from $\varphi$ using the rules of passage and $\varphi$ has a tautological expansion, then $\psi$ has a tautological expansion.
+\end{theo}
+\begin{proof}
+To start with, we note that the rules of passage do not alter whether a variable is general or restricted: whilst rules (1) -- (4) change the quantifier, they also change the number of $\neg$ signs within whose scope the quantifiers occur by $\pm 1$, so the two changes cancel out; and rules (5) -- (12) change neither the quantifiers nor the number of $\neg$ signs within whose scopes they occur.
+
+This proof involves several separate cases. Firstly we split up the proof into two cases, (i) and (ii): the case of rules of passage (1) -- (4) and the case of the rules of passage (5)--(12). We will then split up the second of these cases into two further cases, (ii)(a) and (b): the case where the variable, $x$, whose quantifier is moved in the application of the rule is a general variable and the case where the variable whose quantifier is moved is restricted.
+
+\begin{enumerate}[(i)]
+\item \emph{If $\psi$ is derived from $\varphi$ using rules of passage (1)--(4) and $\varphi$ has a tautological expansion, then $\psi$ has a tautological expansion.}
+
+We first note, by looking at rules of passage (1)--(4), that all variables have the same superior variables in $\varphi$ and in $\psi$. Furthermore, we note that rules of passage (1)--(4) involve moving and changing a quantifier, but do not change anything at all within the subformulas $A(x)$ and $Z$. Recall that the process of Herbrandization involves deleting the quantifiers. Here, the results of deleting the quantifiers in $\varphi$ and $\psi$ will be identical. Furthermore, as each general variable will be replaced by the same function in the process of Herbrandization on $\varphi$ and $\psi$, we can see that $\mbox{Her}(\varphi) = \mbox{Her}(\psi)$. Thus, by Lemma \ref{her eq}, we know that $E(\varphi, p) = E(\psi, p)$ for all $p \ge 0$. Therefore if $\varphi$ has a tautological expansion then $\psi$ has a tautological expansion.  
+
+\item \emph{If $\psi$ is derived from $\varphi$ using rules of passage (5)--(12) and $\varphi$ has a tautological expansion, then $\psi$ has a tautological expansion.}
+
+Before we split this case up into two parts, let us look at $\varphi$ and $\psi$ in more detail. Suppose that $A(x)$ and $Z$ are the subformulas in $\varphi$ and $\psi$ that the rule of passage is concerned with, as in our statement of the rules of passage on page \pageref{rulesofpassage}. Suppose that $x , x_1 , \ldots , x_n$ are the variables in $\varphi$ and $\psi$, and these are re-numbered (if necessary) such that $x , x_1 , \ldots , x_k$ occur in $A(x)$, $x_{k+1} , \ldots , x_m$ occur in $Z$, and $x_{m+1} , \ldots , x_n$ occur elsewhere in $\varphi$ and $\psi$.
+
+Now, consider a general variable $x_i$. If $x_i \in \{ x_{m+1} , \ldots , x_n \}$ then the superior variables of $x_i$ won't have changed, as $x_i$ is not affected by the application of the rule, so $x_i$ will be replaced by the same function in $\psi$ as in $\varphi$ by Herbrandization. Similarly, if $x_i \in \{ x , \ldots , x_k \}$ then its superior variables won't have changed, and it will also be replaced by the same function. However, if $x_i \in \{ x_{k+1} , \ldots , x_m \}$ (that is, if $x_i$ occurs in $Z$) then its superior variables will have changed: specifically, in rules (6), (8), (10) and (12), $x$ will be superior to $x_i$ in $\varphi$ but not in $\psi$, and in rules (5), (7), (9) and (11,) $x$ will be superior to $x_i$ in $\psi$ and not in $\varphi$. This is the case which we must think about further.
+
+\begin{enumerate}[(a)]
+\item \emph{The variable, $x$, whose quantifier is moved in the application of the rule is a general variable.}
+
+If $x$ is a general variable then it is not an argument in the function that replaces a general variable $x_i$. This means that the replacing function of $x_i$ will be the same in $\varphi$ as in $\psi$. This is also the case for every other general variable in $\varphi$ and $\psi$, and so Her($\varphi) = $Her($\psi$). Therefore, by Lemma \ref{her eq}, we know that $E(\varphi, p) = E(\psi, p)$ for all $p \ge 0$. Hence if $\varphi$ has a tautological expansion then so does $\psi$.  
+
+\item \emph{The variable, $x$, whose quantifier is moved in the application of the rule is a restricted variable.}
+
+It is easy to see that this will be a problematic case, because the variables that are superior to the general variables that occur inside the subformula $Z$ will differ between $\varphi$ and $\psi$ (specifically, $x$ will be a superior variable in one but not the other). This means that the functions which replace these variables will not be the same in Her($\varphi$) and Her($\psi$) and thus that $\mbox{Her}(\varphi) \neq \mbox{Her}(\psi)$. Therefore, we cannot use Lemma \ref{her eq}.
+
+Herbrand's proof for this statement is incorrect, and so this is where we rely on the result of Dreben et al., whose workings we do not have space to go into. We therefore take as proven the fact that if $\psi$ is derived from $\varphi$ using rules of passage (5) -- (12) concerning a restricted variable $x$ and if $E(\varphi, p)$ is a tautology for some $p$ then $E(\psi, q)$ is a tautology for some $q \ge p$. That is, if $\varphi$ has a tautological expansion then $\psi$ also has a tautological expansion. \qedhere
+
+\end{enumerate}
+\end{enumerate}
+\end{proof}
+
+Before we move on, we will look quickly at another way of defining a Herbrand expansion. This different way of defining a Herbrand expansion is actually the one used by Herbrand (which he calls Property B); however, one of the first things he does after defining it is to show that it is equivalent to the way of defining it we have used above. He then uses the above definition for the rest of his proof. To keep the proof more concise, we have just used Herbrand's second notion of an expansion (which he calls Property C) from the start.
+
+\begin{mydef}
+Recall that in step (1) of our definition of Herbrandization in \ref{Herbranization}, we stated that a  general variable $x$ will be replaced by a function of the restricted variables that are superior to $x$. Now define \emph{dom-Herbrandization} to be the same as Herbrandization except that we instead replace the general variables by the restricted variables that dominate\footnote{See \ref{dom def}.} them. Denote by $\mbox{Her}_{\mbox{\scriptsize{dom}}}(\varphi)$ the result of dom-Herbrandization on a sentence $\varphi$. Then construct Herbrand domains and Herbrand expansions as before, but with respect to $\mbox{Her}_{\mbox{\scriptsize{dom}}}(\varphi)$ as opposed to Her($\varphi$). We write the newly obtained variant of  $E ( \varphi , p)$ as $E_{\mbox{\scriptsize{dom}}}(\varphi, p)$. We call $E_{\mbox{\scriptsize{dom}}}(\varphi, p)$ the Herbrand expansion of order $p$ of $\varphi$ \emph{with respect to dominance}.
+\end{mydef}
+
+\begin{theo}
+\label{b theorem}
+For all sentences $\varphi$, $E(\varphi, p)$ is a tautology for some $p$ if and only if $E_{\mbox{\scriptsize{dom}}}(\varphi, q)$ is a tautology for some $q$.
+\end{theo}
+
+We omit the proof of this theorem as it is not central to the proof of the version of Herbrand's Theorem we are using. This result shows that a sentence will have a tautological expansion if and only if it has a tautological expansion with respect to dominance, and so it does not matter which version of expansion we use. Therefore we can restate Herbrand's Theorem in the form in which Herbrand stated it:
+
+\begin{theo}[Herbrand's Theorem (version 2)]
+An $\mathcal{L}$-sentence, $\varphi$, is $Q_H$-provable if and only if $E_{\mbox{\scriptsize{dom}}}(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$.
+\end{theo}
+
+This concludes section \ref{sec:bc} and our discussion of tautological expansions for the time being.
+
+\section{Attached Sentences}
+\label{sec:attached}
+
+The aim of the next section, \ref{sec:normal}, will be to prove that if a sentence is normalizable then it is $Q_H$-provable. Before we can define ``normalizable" we must first define a ``normal identity", and before we prove that a normalizable sentence is $Q_H$-provable must prove that a normal identity is $Q_H$-provable. Before we can do any of this, we will prove Lemma \ref{attach produced}, which characterises the different prenex sentences that can be derived from a sentence $\varphi$ using the rules of passage. This will be needed to prove that normal identities are $Q_H$-provable. 
+
+In establishing the definitions needed to state Lemma \ref{attach produced}, we will also meet for the first time the important notion of a dominance tree, which will be used again in sections \ref{sec:normal} and \ref{sec:proof}.
+
+Let us introduce some terminology.
+
+\begin{mydef}
+Suppose $\psi$ is a sentence in prenex form which can derived from a sentence $\varphi$ using the rules of passage. Then we say that $\psi$ is \emph{attached} to $\varphi$.
+\end{mydef}
+
+\begin{mydef}
+If a sentence $\psi$ is in prenex form, it is in the form of a string of quantifiers followed by a quantifier-free $\mathcal{L}$-formula. Call the string of quantifiers the \emph{prefix} of $\psi$ and the quantifier-free $\mathcal{L}$-formula the \emph{matrix} of $\psi$.
+\end{mydef}
+
+\begin{prop}
+Let $M$ be the result of deleting all quantifiers from a sentence $\varphi$, so that we obtain a quantifier-free formula. Then $M$ will be the matrix of all sentences attached to $\varphi$.
+\end{prop}
+\begin{proof}
+If we consider each rule of passage in turn, we note that the input and output of the rule of passage are identical if we delete the quantifiers, as the rule of passage does not change the subformulas $A$ and $Z$. Therefore the result of deleting all quantifiers from a sentence will be the same before and after an application of the rules of passage; in our case, it will always be $M$. In particular, once we have derived a prenex sentence, if we delete the quantifiers we obtain the matrix of the sentence. This must be identical to $M$.
+\end{proof}
+
+This proposition tells us that if two prenex sentences $\psi$ and $\psi '$ are attached to $\varphi$ then their matrices will be identical. Thus when investigating the set of sentences attached to $\varphi$ we need only consider the prefixes of those sentences. Let us extend the definition of ``attached" to apply to prefixes as well as sentences.
+
+\begin{mydef}
+If a string of quantifiers and variables is the prefix of a sentence attached to a sentence $\varphi$,   we also say the prefix is a \emph{prefix attached} to $\varphi$.
+\end{mydef}
+
+We will represent a prefix as a sequence $ ( \pm x_1, \ldots , \pm x_n ) $ where $+$ corresponds to $\forall$, $ -$ corresponds to $\exists$ and $x_1, \ldots , x_n$ are the variables in the prefix.
+
+Let us look at an example of these ideas. Consider once more our sentence $\varphi_1$:
+$$
+\varphi_1 = \exists x \forall y (P(x,y) \lor \neg \forall z P(x,z))
+$$
+Using the rules of passage, this can be written in prenex form either as
+$$
+\varphi_1 ' = \exists x \forall y \exists z (P(x,y) \lor \neg P(x,z))
+$$
+or as
+$$
+\varphi_1 '' = \exists x \exists z \forall y (P(x,y) \lor \neg P(x,z))
+$$
+In this example, $\varphi_1 '$ and $\varphi_1 ''$ are sentences attached to $\varphi$. The corresponding prefixes attached to $\varphi$ are
+$$
+( -x, +y , -z)
+$$
+and
+$$
+( -x, -z, +y).
+$$
+
+Now let us turn to a characterisation of all of the different prefixes attached to an arbitrary sentence. To do this, we introduce the notion of a dominance-preserved prefix. Recall\footnote{See \ref{dom def}} that a variable $x$ dominates a variable $y$ if the minimal scope of $y$ is contained within the minimal scope of $x$.
+
+\begin{mydef}
+\label{dp prefix}
+We will say that a prefix, $\mathcal{P}$, is a \emph{dominance-preserved prefix} of a sentence $\varphi$ if it satisfies the following two criteria:
+\begin{enumerate}[(i)]
+\item The variable letters and their signs in $\mathcal{P}$ are the same as in the prefix of some prenex form of $\varphi$.
+\item Whenever a variable $x$ dominates a variable $y$ in $\varphi$, $x$ precedes $y$ in $\mathcal{P}$ (though not necessarily immediately).
+\end{enumerate}
+\end{mydef} 
+
+We will find it useful at this point to introduce a tool for visualizing the different dominance relations  between the variables in a sentence: namely, a dominance tree. The use of a tree here and in section \ref{sec:normal} differs from Herbrand's original work, in which he uses an array. However, this alternative presentation, which is partly due to Buss in \cite{buss OHT}, makes the notions which Herbrand is trying to communicate a lot clearer. For details on the definition of a tree, the reader can consult \cite{graph}.
+
+\begin{mydef}
+We say that a variable $x$ \emph{immediately dominates} a variable $y$ in a sentence $\varphi$ if $x$ dominates $y$ and there is no variable $z$ such that $x$ dominates $z$ and $z$ dominates $y$.
+\end{mydef}
+
+\begin{mydef}
+The \emph{dominance tree} of a sentence $\varphi$ is a tree (or collection of trees) constructed such that
+\begin{enumerate}[(i)]
+\item The vertices are labelled by the signed variables, $ (\pm x_i) $, which appear in the prefix of some prenex form of $\varphi$. 
+\item A vertex representing a variable $y$ is the child of a vertex representing a variable $x$ if and only if $x$ immediately dominates $y$ in $\varphi$.
+\end{enumerate}
+\end{mydef}
+
+\noindent This is easily illustrated by some examples. Take the sentence $\varphi_1$:
+$$
+\varphi_1 = \exists x \forall y ( P(x , y) \lor \neg \forall z P(x,z))
+$$
+We noted in \ref{ex1} that $x$ dominates $y$ and $z$. Now we note that, furthermore, $x$ immediately dominates $y$ and $z$. Therefore the dominance tree of $\varphi_1$ is the following:
+\\
+
+\Tree[.$-x$ $+y$ [.$-z$ ]]
+
+~\\
+		
+\noindent Alternatively, take the sentence $\varphi_2$:
+$$
+\forall x_1 \exists x_2 \exists x_3 P(x_1, x_2, x_3) \lor \exists y_1 \forall y_2 Q(y_1, y_2)
+$$
+In this example, in the first disjunct $x_1$ dominates $x_2$ and $x_1$ and $x_2$ dominate $x_3$. Therefore $x_1$ immediately dominates $x_2$ and $x_2$ immediately dominates $x_3$. In the second disjunct, $y_1$ immediately dominates $y_2$. In this case, the dominance tree of $\varphi_2$ is composed of two separate sub-trees, as there is no dominance relation between $x_1, x_2$ and $x_3$ and $y_1$ and $y_2$.
+\\
+
+\Tree[.$+x_1$ [.$-x_2$ [.$-x_3$ ]]] \Tree[.$-y_1$ [.$+y_2$ ]]
+
+~\\
+
+In a sentence $\varphi$ a variable $x$ dominates the variables that are its descendants in the dominance tree of $\varphi$. Returning to Definition \ref{dp prefix}, we can see that we can construct  a dominance-preserved prefix of $\varphi_1$ by writing the objects $-x, +y \mbox{ and } -z$ in such a way that $-x$ precedes $+y$ and $-z$. Thus there are two dominance-preserved prefixes of $\varphi_1$:
+$$
+( -x, +y , -z) \mbox{ and } ( -x, -z, +y).
+$$
+\noindent Similarly, we we can construct  a dominance-preserved prefix of $\varphi_2$ by writing the five objects $+x_1, -x_2, -x_3, -y_1 \mbox{ and } +y_2$ in such a way that $+x_1$ precedes $-x_2$ and $-x_3$, $-x_2$ precedes $-x_3$ and $-y_1$ precedes $+y_2$. A simple calculation shows that there are ten permutations that fulfil this condition.
+
+We are now ready to prove a lemma which characterises the prefixes attached to a sentence. The reader may have already noted that the dominance permuted prefixes of $\varphi_1$ are exactly the same as the prefixes attached to $\varphi_1$. Lemma \ref{attach produced} shows that this equivalence holds generally.
+
+\begin{lem}
+\label{attach produced}
+A prefix is attached to a sentence $\varphi$ if and only if it is a dominance-preserved prefix of $\varphi$.
+\end{lem}
+\begin{proof}
+We provide a sketch of the proof, leaving out the technical details due to the large amount of space they consume.
+
+To show that a prefix, $\mathcal{P}$, attached to $\varphi$ is a dominance-preserved prefix of $\varphi$, we need to show that if a variable $x$ dominates a variable $y$ in $\varphi$ then $x$ precedes $y$ in $\mathcal{P}$. This follows from the fact that if $x$ is superior to $y$ then $y$ cannot dominate $x$ (this can be seen by looking at the construction of the minimal scopes of the variables), and the fact that the rules of passage preserve the canonical form\footnote{See \ref{defcan}} of a sentence. Therefore if $x$ dominates $y$ in $\varphi$ then $x$ dominates $y$ in any sentence attached to $\varphi$, and so $y$ cannot be superior to $x$ in any sentence attached to $\varphi$. Thus $x$ must precede $y$ in $\mathcal{P}$.
+
+The reverse direction, that any dominance-preserved prefix of $\varphi$ is attached to $\varphi$, is more technical. First we prove another statement: that if a variable $x$ is not dominated by any other variables in a formula $\psi$, then we can obtain by the rules of passage a formula $\psi '$ such that $\forall x$ or $\exists x$ is an initial part of $\psi '$ and $\psi '$ is equivalent to $\psi$.
+
+Now suppose we have a dominance-preserved prefix, $\mathcal{P}$, of $\varphi$. We can use this statement to iterate through the variables in $\mathcal{P}$ in order, using the rules of passage to bring each to the front of the sub-formula of $\varphi$ which excludes the quantifiers already moved to the left. In this way, we will obtain a prenex sentence equivalent to $\varphi$ whose prefix is the same as $\mathcal{P}$. Therefore $\mathcal{P}$ is attached to $\varphi$.
+\end{proof}
+
+
+\section{Normal Identities}
+\label{sec:normal}
+
+With this result established, we can define a normal identity, and show that all normal identities are $Q_H$-provable. We will then use the notion of normal identities in our definition of normalizable sentences.
+
+For the following passage, until I explicitly say otherwise, we assume that there are no function symbols in any of the sentences we are dealing with. Once we have established some results we will come back to the case where the sentences include function symbols.
+
+\begin{mydef}
+\label{hnorm}
+Define \emph{Normal Substitution} to be the following process:
+\begin{enumerate}[(i)]
+\item Use the rules of passage to obtain some prenex sentence $\varphi'$ (not necessarily Pre($\varphi$)) that is attached to $\varphi$. 
+\item For each restricted variable of $\varphi'$ (i.e. for each variable quantified by $\exists$, as $\varphi'$ is in prenex form) we do one of the following:
+\begin{enumerate}
+\item delete the quantifier and change the variable letter to that of some free variable (which does not necessarily occur in $\varphi'$), or
+\item delete the quantifier and change the variable letter to that of some superior general variable.
+\end{enumerate}
+\item For each general variable of $\varphi'$ (i.e. for each variable quantified by $\forall$), we delete the quantifier to make the variable free.
+\end{enumerate}
+\end{mydef}
+
+\begin{mydef}
+\label{normaldef} 
+A sentence, $\varphi$, is a \emph{normal identity} if we can, in some way, obtain at least one quantifier-free tautology through the process of Normal Substitution on $\varphi$.
+\end{mydef}
+
+There are two places in which we can make choices in Normal Substitution: when choosing the prenex form, $\varphi'$, of $\varphi$ that we will use, and when deciding whether to change the letter of a restricted variable to that of a free variable or a superior general variable. Definition \ref{normaldef} reflects this ability to choose, and says that $\varphi$ is a normal identity if there is some way in which we can make these choices which results in a quantifier-free tautology.
+
+\begin{mydef} 
+Suppose that $\varphi$ is a normal identity. That is, there is some prenex form $\varphi'$ of $\varphi$ such that some Normal Substitution of $\varphi'$ results in a quantifier-free tautology. We say that this quantifier-free tautology is the \emph{identity associated with} $\varphi$, and that the prefix of $\varphi'$ is the \emph{normal prefix} of $\varphi$.
+\end{mydef}
+
+\begin{lem}
+\label{normfin}
+Given any sentence, $\varphi$, we can decide in a finite time whether $\varphi$ is a normal identity.
+\end{lem}
+\begin{proof}
+The following is a decision process that we can carry out on $\varphi$ which will always terminate in a finite amount of time. 
+\begin{enumerate}[(i)]
+\item We take all of the prefixes attached to $\varphi$. We know how to obtain these from Lemma \ref{attach produced}. This will give us all of the prenex sentences $\varphi'$ attached to $\varphi$, and by considering the possible permutations of the letters in the prefixes, we can see that there will be finitely many of these.
+\item Consider all of the ways in which we could choose to change the letter of a restricted variable: these are to change it to that of a superior general variable, change it to a free variable letter that some other restricted quantifier is changed to or change it to a unique free variable letter. (Even though there are infinitely many choices of letter for the last one, we need only consider one as it will be different to all other variable letters, so which letter is chosen will not affect whether the resulting formula is a quantifier-free tautology.) There are finitely many ways in which these choices can be made for all of the restricted variables.
+\item Test whether each of the resulting formulas is a quantifier-free tautology. This can be done in a finite time using the truth-table method as in Remark \ref{truth-tables}.
+\end{enumerate}
+If one of the formulas is a quantifier-free tautology, we can stop and return the result that $\varphi$ is a normal identity. If we run through each option from (i) and (ii) and none of them are quantifier-free tautologies then we return the result that $\varphi$ is not a normal identity.
+\end{proof}
+
+\begin{cor}
+If $\varphi$ is a normal identity, it is $Q_H$-provable.
+\end{cor}
+\begin{proof}
+If we have just carried out the process given in the proof of \ref{normfin}, we will know the identity associated with $\varphi$. Call this $P$. We can then go backwards through the process of Normal Substitution to provide a proof of $\varphi$ in $Q_H$. $P$ is an axiom of $Q_H$. From $P$ we can use the rules of universal and existential generalization to obtain a prenex sentence $\varphi'$ which is attached to $\varphi$. Finally we can use the rules of passage to obtain $\varphi$. This constitutes a $Q_H$-proof, and hence $\varphi$ is $Q_H$ provable.
+\end{proof}
+
+We now have a few more definitions to give before we can give the definition of a normalizable sentence, and prove that any normalizable sentence is $Q_H$-provable.
+
+\begin{mydef}
+We define a \emph{scheme} of a sentence $\varphi$ to be any tree that satisfies the following conditions:
+\begin{enumerate}[(i)]
+\item Every vertex except the top one is labelled by one of the signed variables, $ (\pm x_i) $, which appear in the prefix of Pre($\varphi$).
+\item For every path from the top of the scheme to the bottom of the scheme, if the labels on the path are concatenated then one obtains a prefix attached to $\varphi$.
+\end{enumerate}
+The second condition tells us, by Lemma \ref{attach produced},  that every path from the top to the bottom of the scheme represents a dominance-preserved prefix of $\varphi$. By ``path from the top of the scheme to the bottom of the scheme", we stipulate that we constantly go downwards, from a vertex to one of its children, and never back up. Note that we can have repetition within a scheme, so that two of the children of a vertex can be labelled identically.
+\end{mydef}
+
+\noindent For example, consider our example sentence $\varphi_1$,
+$$
+\varphi_1 = \exists x \forall y ( P(x , y) \lor \neg \forall z P(x,z)),
+$$
+\noindent which had the attached prefixes
+$$
+( -x, +y , -z) \mbox{ and } ( -x, -z, +y).
+$$
+
+\noindent From this we can construct an example scheme of $\varphi_1$ as follows:
+\\
+
+\Tree[. [.$-x$ [.$+y$ [.$-z$ ]] [.$-z$ [. $+y$ $+y$ ]]] [.$-x$ [.$-z$ [.$+y$ ]]]]
+
+~\\
+
+Call this scheme $\mathcal{S}_1$.
+
+\begin{mydef}
+We define the \emph{generation} of a sentence $\psi$ from a formula $\varphi$ and a scheme $\mathcal{S}$ as follows (where $Q = + \mbox{ or } -$):
+\begin{enumerate}[(i)]
+\item Delete all of the quantifiers of $\varphi$ to obtain a quantifier-free formula, $A$.
+\item To a vertex at the bottom of $\mathcal{S}$ labelled $Qx_i$, assign the formula $Qx_i A$.
+\item To each vertex not at the bottom of $\mathcal{S}$ labelled $Qx_i$ such that the formulas $A_1, \ldots, A_k$ are assigned to its children, assign the formula $ Qx_i ( A_1 \lor \ldots \lor A_k)$.
+\item If $B_1, \ldots, B_l$ are the formulas assigned to the top vertices in $\mathcal{S}$ then set
+$$
+\psi ' \coloneqq B_1 \lor \ldots \lor B_l.
+$$
+\item Finally rename variables so that no variable is used twice in $\psi '$ to obtain $\psi$. We know $\psi$ is a sentence because every path from the top to the bottom of $\mathcal{S}$ represents a prefix attached to $\varphi$, so every variable in $A$ will be quantified in $\psi '$ and thus $\psi$ will contain no free variables.
+\end{enumerate}
+We write $\psi = \mbox{Gen}(\varphi, \mathcal{S})$. We will also say that $\mathcal{S}$ \emph{generates} $\psi$ from $\varphi$, or that $\psi$ is generated from $\varphi$.
+\end{mydef}
+
+\noindent Let us illustrate this important definition by evaluating $\mbox{Gen}(\varphi_1, \mathcal{S}_1)$. Deleting the quantifiers of $\varphi_1$ we obtain
+$$
+M(x, y, z) = P(x, y) \lor \neg P(x, z).
+$$
+Working through steps (ii)--(iv) we obtain the sentence
+\begin{align}
+\psi' = \; \; \; \; & \exists x \, ( \forall y \: \exists z M (x, y, z) \lor  \exists z \, ( \forall y  M (x, y, z) \lor \forall y M (x, y, z))) \notag \\
+\lor \: & \exists x \, \exists z \, \forall y M (x, y, z). \notag \\
+\mbox{Finally we rename va} & \mbox{riables so that no variable is repeated. This gives us} \notag \\
+\mbox{Gen}(\varphi_1, \mathcal{S}_1) = \; \; \; \; & \exists x_1 \, ( \forall y_1 \: \exists z_1 \, M (x_1, y_1, z_1) \lor  \exists z_2 \, ( \forall y_2 \, M (x_1, y_2, z_2) \notag \\
+\lor \: & \forall y_3 \, M (x_1, y_3, z_2))) \lor \exists x_2 \, \exists z_3 \, \forall y_4 \, M (x_2, y_4, z_3). \notag
+\end{align}
+
+We can now state the definition of a normalizable sentence.
+
+\begin{mydef}
+Suppose that there is some proposition $\varphi'$ that is generated from a sentence $\varphi$ by some scheme $S$ such that $\varphi'$ is a normal identity. Then we say that $\varphi$ is \emph{normalizable}.
+\end{mydef}
+
+\begin{theo}
+\label{A theorem}
+If a sentence $\varphi$ is normalizable then it is $Q_H$-provable.
+\end{theo}
+\begin{proof}
+Recall that we showed in Corollary 2.4.8. that a normal identity is $Q_H$-provable. Now, $\varphi$ is normalizable if we can generate a sentence $\varphi'$ from it (using some scheme) where $\varphi'$ is a normal identity. If this is the case then we know that $\varphi'$ is $Q_H$-provable. 
+
+All that it remains for us to do is to show that, if $\varphi'$ is generated from $\varphi$, then we can prove $\varphi$ from $\varphi'$ in the proof system $Q_H$. But it is clear that this is true: to prove $\varphi$ from $\varphi'$, we can use a combination of the simplification rule (which is a combination of reversing step (v) of the generation so that the variables are the same, and then deriving a sentence of the form $P$ from  one of form $P \lor P$) and the rules of passage. We know that the rules of passage will be sufficient for us to be able to use the simplification rule to obtain $\varphi$ because each path from the top to the bottom of a scheme represents a prefix of a sentence which is attached to $\varphi$; that is, a prefix of a prenex sentence that is obtained from $\varphi$ by the rules of passage.
+
+Hence if $\varphi'$ is generated from $\varphi$ then we can prove $\varphi$ from $\varphi'$ in the proof system $Q_H$. Because a normal identity is $Q_H$-provable, we therefore know that if $\varphi$ is normalizable then it is $Q_H$-provable.
+\end{proof}
+
+Note that, unlike in the case of normal identities, we cannot decide given an arbitrary sentence $\varphi$ whether $\varphi$ is normalizable; this is because we have no way of choosing the scheme which we should use to generate a normal identity, and because there are infinitely many possible schemes for each sentence (so that we can't exhaust the list by checking them in turn). This is an important point in the treatment of validity problems in computer science, because validity of first order logic is a semi-decidable problem. For more information see section \ref{sec:atp} and \cite{ai} (pp. 286--290).
+
+The point of Theorem \ref{A theorem} is to say that, though we cannot decide whether a sentence $\varphi$ is normalizable, if we know that a sentence $\varphi$ is normalizable then we know we know that it is $Q_H$-provable: that is, we know that there is some quantifier-free tautology which can be used as an axiom and from which we can use the rules of inference of $Q_H$ to obtain some sentence which is a normal identity, and from this normal identity we can use the rules of inference to obtain $\varphi$.
+ 
+\begin{remark}
+\label{norm crit}
+It is worth looking in more detail at how we may ``know that a sentence is normalizable". We must establish three things in order to show that a sentence, $\varphi$, is normalizable:
+\begin{enumerate}[(i)]
+\item A scheme which generates a sentence $\varphi'$.
+\item A sentence $\varphi''$ which is attached to $\varphi'$.
+\item The general or free variables with we which we should replace the restricted variables in $\varphi''$ in order to obtain a quantifier-free tautology.
+\end{enumerate}
+\end{remark}
+
+\begin{mydef} 
+When specifying the general or free variables with which we should replace the restricted variables of a sentence, $\varphi''$,  in order to obtain a quantifier-free tautology, as in (iii) above, we will obtain a series of equations between variables. We will call these the \emph{associated equations} of $\varphi''$.
+\end{mydef}
+
+We have almost finished this section. There is one more thing for us to discuss before we move onto the proof of Herbrand's Theorem. Before defining Normal Substitution in \ref{hnorm} we specified that the sentences that we were speaking of did not contain function symbols. We can now expand our definitions to include function symbols.
+
+In fact this is fairly easy. Our definition of a normalizable sentence, and all of the definitions that are established in order to define this, remain the same. The only change is in the definition of Normal Substitution, and in particular with what terms we can replace restricted variables. Compare the following to \ref{hnorm}.
+
+\begin{mydef}
+We now define \emph{Normal Substitution} of a sentence to be the following process:
+\begin{enumerate}[(i)]
+\item Use the rules of passage to obtain some prenex sentence $\varphi'$ (not necessarily Pre($\varphi$)) that is attached to $\varphi$. 
+\item For each restricted variable of $\varphi'$ (i.e. variable quantified by $\exists$, as $\varphi'$ is in prenex form) we do one of the following:
+\begin{enumerate} 	
+\item delete the quantifier and change the variable letter to that of some free variable (which does not necessarily occur in $\varphi'$), or
+\item delete the quantifier and change the variable letter to that of some superior general variable, or
+\item delete the quantifier and change the variable letter to a function $f(x_1, \ldots , x_n)$ where $x_1, \ldots , x_n$ are all either superior general variables or free variables (which may or may not occur in $\varphi'$).
+\end{enumerate}
+\item For each general variable of $\varphi'$ (i.e. variable quantified by $\forall$), we delete the quantifier to make the variable free.
+\end{enumerate}
+\end{mydef}
+
+Thus when we include function symbols, we must include this new possibility when checking through the ways we can replace a restricted variable, in order to see whether a sentence is a normal identity. There are still a finite number of these (either we introduce a new function symbol, a function symbol that appears in $\varphi$ or a function symbol that has been used before in the normal substitution) so it is still possible to decide whether an arbitrary sentence is a normal identity. Furthermore, the existential generalisation rule of $Q_H$  allows us to deduce $\exists \varphi(x)$ from $\varphi(\tau)$ where $\tau$ is a term, so we still have the result that a normal identity is provable. This means, importantly, that Theorem \ref{A theorem} and its proof still hold for our widened consideration of sentences with function symbols.
+
+\label{unif} When showing that a sentence is a normal identity, we noted above that we need to specify the associated equations. This is an easy process when we only have to deal with the options of superior general variables or free variables, but becomes more complicated when we also have to consider function symbols. Nevertheless, it is still possible to carry this out via a standard process in a finite time. Herbrand provided a sketch of this process, and the idea behind this process went on to have great significance in computer science, where it became known as the Unification Algorithm. Herbrand's influence here is acknowledged in \emph{The Handbook of Automated Reasoning} \cite{Handbook reasoning}, where Baader and Snyder write that ``The description by Herbrand of the unification algorithm...  appears to be the first published account of such an algorithm." More about the unification algorithm can be read in \cite{Handbook reasoning}, Chapter 8.
+
+\section{Proof of Herbrand's Theorem}
+\label{sec:proof}
+
+We will now use what we have proved in the previous sections to prove Herbrand's Theorem. Let us restate it first, in the form in which we stated it in section \ref{sec: sketch}.
+\addtocounter{theo}{-5}
+\begin{theo}[Herbrand's Theorem]
+An $\mathcal{L}$-sentence, $\varphi$, is $Q_H$-provable if and only if $E(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$.
+\end{theo}
+\begin{proof}
+\begin{enumerate}[(i)] 
+\item \emph{If $E(\varphi, p)$ is a quantifier-free tautology for some $p \ge 0$ then $\varphi$ is $Q_H$-provable.}
+
+We have already shown that that if a sentence is normalizable then it is $Q_H$-provable (Theorem \ref{A theorem}). Here we shall show that if a sentence $\varphi$ has a tautological expansion then $\varphi$ is normalizable.
+
+Suppose $\varphi$ is a sentence such that $E(\varphi, p)$ is a tautology for some $p \ge 0$. Recall Remark \ref{norm crit}, in which we stated three things that must be established to show that $\varphi$ is normalizable: a scheme which generates a sentence, $\varphi'$, from $\varphi$ and then a sentence $\varphi''$ attached to $\varphi'$ and a set of associated equations of $\varphi''$ that show that $\varphi'$ is a normal identity. We shall provide all three of these things in the following proof.
+
+First we provide a scheme $\mathcal{S}$ which we will later show generates a normal identity from $\varphi$. The idea of this is that our construction of $\mathcal{S}$ will mirror the process of obtaining a Herbrand expansion.
+
+Recall that $E(\varphi, p)$ is a tautology for some $p \ge 0$. Suppose that $ | D(\varphi , p) | = N $. We construct a scheme $\mathcal{S}$ as follows:
+\begin{itemize}
+\item Consider the prefix of Pre($\varphi$). Each path from the top to the bottom of $\mathcal{S}$ will represent this prefix: that is, the variables will appear in the same order in every row.
+\item Each time there is universally quantified variable $x_i$ in $\mathcal{P}$, the vertex representing the quantifier before it will only have one child: namely, a vertex labelled $+x_i$. 
+\item Each time there is an existentially quantified variable $x_j$ in $\mathcal{P}$, the vertex representing the quantifier before it will have $N$ children labelled $-x_j$.
+\end{itemize}
+
+Suppose we have that $D(\varphi, p) = \{ a_1, \ldots, a_N \} $. To each existentially quantified variable in the scheme, we shall say that the $i$th existentially quantified variable at each branching point is \emph{linked} to $a_i$.
+
+In the rest of this proof I will show that the sentence $\psi$ generated from $\mathcal{S}$ and $\varphi$ is a normal identity. To do this we need to provide a prenex sentence attached to $\psi$ (or equivalently, some prefix attached to $\psi$) and a set of associated equations.
+
+Suppose that the maximum height\footnote{See \ref{height}.} of a term in $\varphi$ is $h$. Before we give the attached sentence and its associated equations, we need to first define a correspondence between $D(\varphi, p + h +1)$ and a set of variables (including all of the universally quantified variables in $\psi$). We do this in three steps:
+\begin{enumerate}[(i)]
+\item For each universally quantified variable, $+x$, in $\varphi$, suppose that $f_x$ is the function with which $x$ is replaced in the process of Herbrandization. Then $x$ corresponds to the element $f_x (a_{i_1}, \ldots, a_{i_k}) \in D(\varphi, p)$, where $a_{i_1}, \ldots, a_{i_k}$ are the elements linked to the variables of whom $x$ is a descendant in $\mathcal{S}$ (there will be the correct number of superior variables to fill the arguments of $f_x$, because of how we have constructed $\mathcal{S}$).
+\item Each element of $D(\varphi, 0)$ corresponds to a new variable, which does not appear in $\psi$.
+\item For each element $a \in D(\varphi, p + h +1)$ which does not yet correspond to any variable, we do the following: we know $a = f_j(a_{j_1}, \ldots, a_{j_k})$ for some $f_j$ and some $a_{i_1}, \ldots, a_{i_k} \in D(\varphi, k)$ where $k < \mbox{height}(a) $. We say that $a$ corresponds to $f_j(\tau_{j_1}, \ldots, \tau_{j_k})$ where $\tau_{j_1}, \ldots, \tau_{j_k}$ are the terms which correspond to $a_{j_1}, \ldots, a_{j_k}$.
+\end{enumerate}
+
+In this way we can see that each element of $D(\varphi, p + h +1)$ corresponds to exactly one variable or function of (functions of $\ldots$ functions of) variables. Using this correspondence, we can complete the proof.
+
+To obtain the attached prefix, $\mathcal{P}$, let the \emph{order} of each path from the top to the bottom of the scheme $\mathcal{S}$ be defined as the greatest of the heights of the elements of $D(\varphi, p)$ which are linked to the existentially quantified variables in that path. Then we construct the attached prefix so that it consists of all the variables that were in the paths of order $0$ followed by the variables that were in the paths of order $1$, and so on up until the paths of order $p$.
+
+We obtain the associated equations by equating each existentially quantified variable $x$ with the term that corresponds to the element linked to $x$. These equations are guaranteed to be solvable because we have constructed the attached prefix in such a way that variables will only be equated to terms involving universally quantified variables superior to them.
+
+If we carry out the process of Normal Substitution on $\psi$ by constructing the sentence that has the prefix $\mathcal{P}$ and changing the existentially quantified variables to the terms dictated by the associated equations provided above, we will obtain a quantifier-free formula which is identical to $E (\varphi, p)$ but with each element of $D( \varphi, p)$ replaced by the term it corresponds to. This replacing of terms with other terms does not change the fact that this sentence is a quantifier-free tautology. Therefore $\psi$ is a normal identity, and thus $\varphi$ is normalizable.
+
+\item \emph{If $\varphi$ is $Q_H$-provable then it has a tautological expansion.}
+
+We proceed by induction on the length of a proof of $\varphi$ in the system $Q_H$.
+
+\begin{enumerate}
+\item If $\varphi$ is a quantifier free tautology then $\varphi$ has a tautological expansion.
+
+Specifically the Herbrand expansion of order $0$ of $\varphi$ is a quantifier-free tautology. For if $\varphi$ is a quantifier-free tautology then it is true whatever truth-values are given to each of its constituent atomic formulas. If we replace each free variable in Her($\varphi)$ by the constant letter $c_0$, then this will result in a sentence that is still true whatever truth-values are given to each of its constituent atomic formulas. Hence $E(\varphi, 0)$ will be a quantifier-free tautology, and thus $\varphi$ has a tautological expansion of order 0.
+
+\item MP: If $\varphi$ and $\neg \varphi \lor \psi$ have tautological expansions, then $\psi$ has a tautological expansion.
+
+We omit this proof, which is lengthy but not difficult. The idea is to rewrite $\varphi \land (\neg \varphi \lor \psi)$ in a certain prenex form and then display a mapping between the Herbrand domains constructed from this sentence and the Herbrand domains $D(\psi, p)$, such that if $E((\varphi \land (\neg \varphi \lor \psi)), q)$ is a tautology then $E(\psi, r)$ will be a tautology for some $r \ge q$. For the details of this, see Section 5.3. of \cite{herb english} (pp. 172--174).
+
+\item Simplification: If $\varphi \lor \varphi'$ has a tautological expansion then $\varphi$ has a tautological expansion, where $\varphi'$ is an alphabetical variant of $\varphi$. 
+
+This proof follows routinely from the definition of a tautological expansion.
+
+\item Universal generalization: If $\varphi(x)$ has a tautological expansion for some free variable $x$, then $\forall x \varphi(x)$ has a tautological expansion. 
+
+This is immediate from the fact that, since the start of section \ref{sec:expans}, we have been treating $\varphi(x)$ and $\forall x \varphi(x)$ in identical ways. Thus if one has a tautological expansion, so must the other.
+
+\item Existential generalization: If $\varphi ( \tau )$ has a tautological expansion for some term $\tau$, then $\exists x \varphi (x)$ has a tautological expansion.
+
+Suppose that $x_1, \ldots, x_k$ are the free variables in $\tau$, so that $\tau \equiv F(x_1, \ldots, x_k)$ for some function $F$. If height($\tau) = n$ then we have that $F(c_0, \ldots, c_0) \in D(\varphi(\tau), n)$.
+
+Now, we know that $E(\varphi ( \tau ), p)$ is a tautology for some $p$. Consider $E(\exists x \varphi (x), p+n)$, and in particular consider the disjuncts of the expansion in which $x$ is replaced by $F(c_0, \ldots, c_0)$. This sub-formula of  $E(\exists x \varphi (x), p+n)$ will be equivalent to $E(\varphi ( \tau ), p)$ (because $x_1, \ldots, x_k$ are free in $\varphi ( \tau )$ and so will be replaced by constants in Her($\varphi ( \tau ))$), and so this sub-formula is a tautology. Therefore $E(\exists x \varphi (x), p+n)$ will also be a tautology.
+
+\item Rules of Passage: If $\varphi$ has a tautological expansion and $\psi$ is obtained from $\varphi$ by use of the rules of passage, then $\psi$ has a tautological expansion.
+
+We saw in Theorem \ref{c theorem} that the rules of passage preserve the property of having a tautological expansion.
+
+\end{enumerate}
+
+Therefore, by induction on a proof of a sentence $\varphi$, we have proven that if $\varphi$ is $Q_H$-provable then it has a tautological expansion.
+
+\end{enumerate}
+
+\noindent This concludes our proof of the statement that for all $\mathcal{L}$-sentences $\varphi$, $\varphi$ is $Q_H$-provable if and only if it has a tautological expansion.
+\end{proof}
+
+\begin{remark} 
+\label{con remark}
+In the introduction I aimed to impress on the reader the fact that Herbrand's original proof is as historically significant as the statement of his theorem. One of the key aspects of this was that the constructive nature of his claims about provability allows a computer to not only show when a proof is possible but also to provide an actual proof of a sentence. Given the proof of Herbrand's Theorem, we can now see in more detail how this is possible. Suppose, for a sentence $\varphi$, we have found that $E(\varphi, p)$ is a quantifier-free tautology. We start with $E(\varphi, p)$, which is an axiom in $Q_H$. Then, in exactly the same way that we showed a normalizable sentence has a $Q_H$ proof in Theorem \ref{A theorem}, we know that $\varphi$ is a normalizable sentence and so can also construct a proof for it, proceeding via the normal identity $\psi$ given in the first part of the proof of Herbrand's Theorem.
+\end{remark}
+
+
+\begin{thebibliography}{99}
+\raggedright
+
+\bibitem{Handbook reasoning}
+\textsc{F. Baader} and \textsc{W. Snyder},
+`Unification Theory',
+\emph{Handbook of Automated Reasoning}
+(ed. A. Robinson and A. Voronkov, Elsevier, Amsterdam, 2001)
+439--526.
+
+\bibitem{buss}
+\textsc{S. Buss}, 
+`An Introduction to Proof Theory',
+\emph{Handbook of Proof Theory}
+(ed. S Buss, Elsevier, Amsterdam, 1998)
+1--78.
+
+\bibitem{buss OHT}
+\textsc{S. Buss},
+`On Herbrand's Theorem',
+\emph{Logic and Computational Complexity},
+Lecture Notes in Computer Science 960
+(1995)
+195--209
+
+\bibitem{chevalley}
+\textsc{C. Chevalley},
+`Sur la pens\'e{e} de J. Herbrand' [On Herbrand's Thought],
+\emph{L'enseignement math\'e{matique}} 34
+(1935-36)
+97--102.
+Also in \cite{herb french}; English translation in \cite{herb english}.
+
+\bibitem{chevalley2}
+\textsc{C. Chevalley} and \textsc{A. Lautman},
+\`Notice biographique sur Jacques Herbrand' [Biographical note on Jacques Herbrand],
+\emph{Annuaire de l'Association amicale de secours des anciens \'e{l}\'e{ves} de l'\'E{cole} normale sup\'e{rieure}}
+(1931)
+66--68.
+Also in \cite{herb french}; English translation in \cite{herb english}.
+
+\bibitem{kr&r}
+\textsc{B. Cuenca Grau},
+Knowledge Representation and Reasoning Lecture Notes,
+2014
+(University of Oxford)
+https://www.cs.ox.ac.uk/teaching/materials13-14/KRR/
+
+\bibitem{Dreb1}
+\textsc{B. Dreben, P. Andrews} and \textsc{S. Aanderaa},
+`False lemmas in Herbrand',
+\emph{Bulletin of the American Mathematical Society} 69
+(1963)
+699--706.
+
+\bibitem{Dreb2}
+\textsc{B. Dreben} and \textsc{P. Andrews},
+`Herbrand analyzing functions',
+\emph{Bulletin of the American Mathematical Society} 70
+(1964)
+697--698.
+
+\bibitem{Dreb3}
+\textsc{B. Dreben} and \textsc{J. Denton},
+`A supplement to Herbrand',
+\emph{Journal of Symbolic Logic} 31,
+(1966)
+393--398.
+
+\bibitem{enderton}
+\textsc{H. Enderton},
+\emph{A Mathematical Introduction to Logic}, 2nd edn.
+(Academic Press, London, 2002).
+
+\bibitem{gentzen}
+\textsc{G. Gentzen}
+`Untersuchungen \"u{ber} das logische Schlie\ss{en}',
+\emph{Mathematische Zeitschrift} 39
+(1935)
+176--210, 405--431,
+English Translation in \emph{Collected Papers of Gerhard Gentzen} (ed.  M. Szabo, North-Holland, Amsterdam) 1969.
+
+\bibitem{goldfarb90}
+\textsc{W. Goldfarb},
+`Herbrand's Theorem and the Incompleteness of Arithmetic',
+\emph{IYYUN: The Jerusalem Philosophical Quarterly} 39 
+(1990)
+45--64.
+
+\bibitem{goldfarb93}
+\textsc{W. Goldfarb},
+`Herbrand's Error and G\"{odel's} Correction',
+\emph{Modern Logic} 3
+(1993)
+103--118.
+
+\bibitem{jhdiss}
+\textsc{J. Herbrand},
+`Recherches sur la th\'e{orie} de la d\'e{monstration}' [Investigations in Proof Theory],
+Thesis, University of Paris, 1930.
+Also in \cite{herb french}; English translation in \cite{herb english}. English translation of Chapter 5 in \cite{f to g}.
+
+\bibitem{jh hilbert}
+\textsc{J. Herbrand},
+`Les bases de la logique hilbertienne' [The Principles of Hilbert's Logic],
+\emph{Revue de m\'e{taphysique} et de morale} 37
+(1930)
+243--255.
+Also in \cite{herb french}; English translation in \cite{herb english}.
+
+\bibitem{jh consistency}
+\textsc{J. Herbrand},
+`Sur la non-contradiction de l'Arithmetique' [On the consistency of Arithmetic],
+\emph{Journal f\"u{r} die reine und angewandte Mathematik} 166
+(1932)
+1--8.
+Also in \cite{herb french}; English translation in \cite{herb english} and \cite{f to g}.
+
+\bibitem{herb french}
+\textsc{J. Herbrand},
+\emph{\'E{crits} logiques}
+(ed. J. van Heijenoort, Presses Universitaires de France, Paris, 1968).
+
+\bibitem{herb english}
+\textsc{J. Herbrand},
+\emph{Logical Writings}
+(ed. W. Goldfarb, Harvard University Press, Cambridge, Massachusetts, 1991). 
+An English translation of \cite{herb french}.
+
+\bibitem{hilbertbernays}
+\textsc{D. Hilbert} and \textsc{P. Bernays}, 
+\emph{Grundlagen der Mathematik} vol. 2, 
+(Springer, Berlin, 1939).
+
+\bibitem{logic10}
+\textsc{J. Koenigsmann} and \textsc{J. Z\'a{vodn}\'y}, 
+B1a Logic Lecture Notes, 
+2010 
+(University of Oxford) 
+http://www.maths.ox.ac.uk/system/files/coursematerial/2013/2369/4/logic.pdf
+
+\bibitem{graph}
+\textsc{O. Riordan}, \\
+B11b Graph Theory Lecture Notes,
+2014
+(University of Oxford)
+http://www.maths.ox.ac.uk/system/files/coursematerial/2013/2647/17/notes.pdf
+
+\bibitem{ai}
+\textsc{S. Russell} and \textsc{P. Norvig},
+\emph{Artificial Intelligence: A Modern Approach}, 3rd edn.
+(Pearson, London, 2010).
+
+\bibitem{takeuti}
+\textsc{G. Takeuti},
+\emph{Proof Theory}, 2nd edn.
+(North-Holland, Amsterdam, 1987).
+
+\bibitem{schutte}
+\textsc{K. Sch\"u{tte}},
+\emph{Proof Theory}
+(Translated by J. Crossley, Springer-Verlag, Berlin, 1977).
+
+\bibitem{shoenfield}
+\textsc{J. Shoenfield},
+\emph{Mathematical Logic}
+(Addison-Wesley, London, 1967).
+
+\bibitem{sieg}
+\textsc{W. Sieg},
+`Only two letters: The correspondence between Herbrand and G\"o{del}',
+\emph{The Bulletin of Symbolic Logic} 11(2)
+(2005)
+172--184.
+
+\bibitem{f to g}
+\textsc{J. van Heijenoort} (ed.),
+\emph{From Frege to G\"{odel}: A Source Book in Mathematical Logic, 1879-1931}
+(Harvard University Press, Cambridge, Massachusetts, 1967).
+
+\bibitem{jvh history}
+\textsc{J. van Heijenoort},
+`Jacques Herbrand's Work in Logic and its Historical Context',
+\emph{Jean van Heijenoort: Selected Essays}
+(Bibliopolis, Naples, 1985)
+99--122.
+
+\end{thebibliography}
+
+\end{document}
