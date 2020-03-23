@@ -11,5 +11,5 @@ From looking through / thinking this afternoon, this seems like a (non-complete)
 
 Some additional nice-to-have things that I seem to remember Alex Paseau suggesting:
 - More signposting early on about the structure of the proof and the purpose of all of the parts of Chapter 2 (although sort of have this in 2.3)
-- A table to show equivalences between Herbrand's original terms and my terms (I seem to remember her are all quite vague like Property A and mine are hopefully more self-explanatory)
+- A table to show equivalences between Herbrand's original terms and my terms (I seem to remember his are all quite vague like Property A and mine are hopefully more self-explanatory)
 
